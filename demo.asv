@@ -1,0 +1,126 @@
+
+addpath(genpath('./csh')); 
+addpath ./flow-code-matlab;
+addpath ./utils;
+% image_cell = {'frame_0001','frame_0002','frame_0003','frame_0004','frame_0005',...
+%     'frame_0006','frame_0007','frame_0008','frame_0009','frame_0010','frame_0011','frame_0012',...
+%     'frame_0013','frame_0014','frame_0015','frame_0016','frame_0017','frame_0018',...
+%     'frame_0019','frame_0020','frame_0021'};
+% image_cell = {'frame_0001','frame_0002','frame_0003','frame_0004','frame_0005',...
+%     'frame_0006','frame_0007','frame_0008','frame_0009','frame_0010','frame_0011','frame_0012',...
+%     'frame_0013','frame_0014','frame_0015','frame_0016','frame_0017','frame_0018',...
+%     'frame_0019','frame_0020','frame_0021','frame_0022','frame_0023','frame_0024','frame_0025',...
+%     'frame_0026','frame_0027','frame_0028','frame_0029','frame_0030','frame_0031','frame_0032',...
+%     'frame_0033','frame_0034','frame_0035','frame_0036','frame_0037','frame_0038',...
+%     'frame_0039','frame_0040','frame_0041','frame_0042'};
+% image_cell = {'frame_0001','frame_0002','frame_0003','frame_0004','frame_0005',...
+%     'frame_0006','frame_0007','frame_0008','frame_0009','frame_0010','frame_0011','frame_0012',...
+%     'frame_0013','frame_0014','frame_0015','frame_0016','frame_0017','frame_0018',...
+%     'frame_0019','frame_0020','frame_0021','frame_0022','frame_0023','frame_0024','frame_0025',...
+%     'frame_0026','frame_0027','frame_0028','frame_0029','frame_0030','frame_0031','frame_0032',...
+%     'frame_0033','frame_0034','frame_0035','frame_0036','frame_0037','frame_0038',...
+%     'frame_0039','frame_0040','frame_0041','frame_0042','frame_0043','frame_0044',...
+%     'frame_0045','frame_0046','frame_0047',...
+%     'frame_0048','frame_0049','frame_0050'};
+% for i = 4:5
+%     filename1 = image_cell{i}; % 取前一帧
+%     filename2 = image_cell{i+1}; % 取后一帧
+%     I0 = imread(['C:\Users\Administrator\Desktop\NNF-Flownet20\ambush_2','\',filename1,'.png']);%%跑到41
+%     I1 = imread(['C:\Users\Administrator\Desktop\NNF-Flownet20\ambush_2','\',filename2,'.png']);
+%     %% direct CSH
+%     csh_wid = 8;
+%     [uv1,flag1] = CSH_nn_flow_base(I0,I1,[],csh_wid,1);
+%     [histmat_csh top_uv2] = Dominant_Offset(uv1,flag1);
+%     %% top homography computation by SIFT
+%     top_homo = Dominant_Transform(uv1);
+%     %% motion segmentation
+%     [uv,uv1,uv2] = knn_flow(I0,I1,top_uv2,top_homo);
+%     %% continuous refinement
+%     uvo = estimate_flow_interface2(I0,I1, 'classic+nl', [], uv);
+%     RS = figure(1);
+%     path2 =  'C:\Users\Administrator\Desktop\NNF-Flownet20\结果\NNF\';
+%     imshow(uint8(flowToColor(uvo))); 
+%     saveas(RS, [path2, num2str(filename1),'.png']);
+% %     writeFlowFile(uvo, 'C:\Users\Administrator\Desktop\NNF-Flownet20\结果\NNF\frame_0021.flo');
+%     path = 'C:\Users\Administrator\Desktop\NNF-Flownet20\结果\NNF\';
+%     writeFlowFile(uvo, [path, num2str(filename1),'.flo']);
+%     disp(['第',filename1,'序列完成 @_@'])
+% end
+% disp('@_@ Game Over @_@');
+% tic;
+% 
+%   obj = VideoReader('E:\葛利跃\在投论文\TMM二修\UCF101\视频选择\v_BenchPress_g11_c03.avi');%输入视频位置
+%   numFrames = obj.NumberOfFrames;% 帧的总数  NumberOfFrames
+%   for k = 1 :67% 读取所有帧
+%         im1 = read(obj,k);
+%         path1 = 'C:\Users\Administrator\Desktop\everyFrame\v_BaseballPitch_g10_c01\';
+%         imwrite(im1,[path1,strcat('v_BaseballPitch_g10_c01_',num2str(k),'.png')],'png');% 保存帧
+%         
+%         im2 = read(obj,k+1);
+        im1 = imread('C:\Users\gly\Desktop\sgyj\fzgz\TaiChi\JOF\4.jpg');
+        im2 = imread('C:\Users\gly\Desktop\sgyj\fzgz\BenchPress\5.jpg');
+        csh_wid = 2;
+        [uv1,flag1] = CSH_nn_flow_base(im1,im2,[],csh_wid,1);
+        [histmat_csh top_uv2] = Dominant_Offset(uv1,flag1);
+        %% top homography computation by SIFT
+        top_homo = Dominant_Transform(uv1);  
+        %% motion segmentation
+        [uv,uv1,uv2] = knn_flow(im1,im2,top_uv2,top_homo);
+%         writeFlowFile(uv, 'C:\Users\gly\Desktop\8.flo'); 
+%         imwrite(uint8(flowToColor(uv)),'C:\Users\gly\Desktop\8.png');
+        %% continuous refinement
+        uvo = estimate_flow_interface2(im1,im2, 'classic+nl', [], uv);
+        writeFlowFile(uv, 'C:\Users\gly\Desktop\sgyj\fzgz\BenchPress\JOF\4.flo'); 
+%         % Display estimated flow fields
+%         imshow(uint8(flowToColor(uv)));
+%         imwrite(uint8(flowToColor(uv)),'C:\Users\gly\Desktop\sgyj\fzgz\BenchPress\JOF\8.png');
+        fprintf('over_JOF\n');
+%         path2 = 'C:\Users\Administrator\Desktop\flowResult\JOF\v_BenchPress_g11_c03\';
+%         R = uint8(flowToColor(uvo));
+%         imwrite(R,[path2,strcat('v_BenchPress_g11_c03_',num2str(k),'.png')],'png');
+%         path3 = 'C:\Users\Administrator\Desktop\nextFrame\JOF\v_BenchPress_g11_c03\';
+%         writeFlowFile(uvo, [path3, strcat('v_BenchPress_g11_c03_', num2str(k)), '.flo']);
+%   end
+
+
+
+
+
+
+
+% I0 = imread('F:\覃仁智光流相关资料\实验程序\测试序列模板\training\clean2\alley_2\frame_0032.png');
+% I1 = imread('F:\覃仁智光流相关资料\实验程序\测试序列模板\training\clean2\alley_2\frame_0033.png');
+% %% direct CSH
+% csh_wid = 8;
+% [uv1,flag1] = CSH_nn_flow_base(I0,I1,[],csh_wid,1);
+% [histmat_csh top_uv2] = Dominant_Offset(uv1,flag1);
+% 
+% %% top homography computation by SIFT
+% top_homo = Dominant_Transform(uv1);
+%     
+% %% motion segmentation
+% [uv,uv1,uv2] = knn_flow(I0,I1,top_uv2,top_homo);
+% 
+% 
+% %% continuous refinement
+% uvo = estimate_flow_interface2(I0,I1, 'classic+nl', [], uv);
+% toc;
+% save('E:\葛利跃\在投论文\TMM二修\patch分类光流\alley_2JMor3.mat','uvo');
+% flow = readFlowFile('F:\覃仁智光流相关资料\实验程序\测试序列模板\training\flow\alley_2\frame_0032.flo');
+% tu = flow(:,:,1);
+% tv = flow(:,:,2);
+% %                      
+% UNKNOWN_FLOW_THRESH = 1e9; 
+% tu (tu>UNKNOWN_FLOW_THRESH) = NaN;
+% tv (tv>UNKNOWN_FLOW_THRESH) = NaN;
+% R = uint8(flowToColor(uvo)); 
+% imshow(uint8(flowToColor(uvo))); 
+% path = 'E:\葛利跃\在投论文\TMM二修\patch分类光流\';
+% imwrite(R,[path, 'alley_2JMor3.png'])
+% 
+% if sum(~isnan(tu(:))) > 1
+% 
+%     [aae stdae aepe] = flowAngErr(tu, tv, uvo(:,:,1), uvo(:,:,2), 0); % ignore 0 boundary pixels
+%     fprintf('\nAAE %3.3f average EPE %3.3f \n', aae, aepe);
+%     
+% end;

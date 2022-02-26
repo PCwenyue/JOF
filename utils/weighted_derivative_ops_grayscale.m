@@ -1,0 +1,49 @@
+function [weights_x weights_y] = weighted_derivative_ops_grayscale(M, N, I0, beta, nu, zero_pedding)
+
+if ~exist('zero_pedding','var')
+    zero_pedding = 1;
+end
+
+	MN = M*N;
+	[X,Y]  = meshgrid(1:N, 1:M);
+
+	%% Derivative in X direction
+	edges = [ vec(sub2ind([M N], Y(:, 1:end-1), X(:, 1:end-1))) ...
+	          vec(sub2ind([M N], Y(:, 1:end-1), X(:, 1:end-1)+1)) ];%[1 26;2 27;...]
+	nedges = size(edges, 1);
+
+	%% Compute image features
+	weights = makeweights(edges, vec(I0), beta);
+
+	weights_x = nu + (1-nu)*weights;
+    if zero_pedding == 1
+        weights_x = [ zeros(M,1) ; weights_x ];
+    end
+	%% The derivative operator in X direction
+	%D1 = sparse([edges(:,1); edges(:, 1)], [edges(:, 1); edges(:,2)], [-weights_; weights_], MN, MN);
+
+	%% Derivative in Y direction
+	edges = [vec(sub2ind([M N], Y(1:end-1,:), X(1:end-1,:)))  ...
+	         vec(sub2ind([M N], Y(1:end-1,:)+1, X(1:end-1,:)))];%[1 2;2 3;...]
+					
+	nedges = size(edges, 1);
+
+	%% Compute image features
+	weights = makeweights(edges, vec(I0), beta);
+
+	weights_y = nu + (1-nu)*weights;
+    if zero_pedding == 1
+        weights_yy = zeros(MN,1);
+        for i=1:N
+            weights_yy( (i-1)*M+2:i*M ) = weights_y( (i-1)*(M-1)+1:i*(M-1) );
+        end
+        weights_y = weights_yy;
+    end
+	%% The derivative operator in Y direction
+	%D2 = sparse([edges(:,1); edges(:, 1)], [edges(:, 1); edges(:,2)], [-weights_; weights_], MN, MN);
+
+end
+
+function f = vec(f)
+f = f(:);
+end
